@@ -1,0 +1,59 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set cache-key
+        env:
+          TZ: 'Asia/Tokyo'
+        run: echo "CURRENT_DATETIME=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Cache choosenim
+        uses: actions/cache@v3
+        with:
+          path: ~/.choosenim
+          key: ${{ runner.os }}-choosenim-${{ env.CURRENT_DATETIME }}
+        if: runner.os != 'Windows'
+
+      - name: Cache nimble
+        uses: actions/cache@v3
+        with:
+          path: ~/.nimble
+          key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
+        if: runner.os != 'Windows'
+
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-linux-gnu
+          - os: windows-latest
+            target: x86_64-windows-gnu
+
+    needs: setup
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Nim
+        uses: jiro4989/setup-nim-action@v1.1.4
+
+      - name: Install Packages
+        run: nimble install -Y nigui nimcrypto
+
+      - name: Build
+        run: nim c --outdir:"build/${{ matrix.target }}" src/main.nim
+
+      - name: Upload executable files
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.target }}
+          path: build/${{ matrix.target }}
