@@ -2,7 +2,7 @@ import nigui, nimcrypto, threadpool
 
 const BufferLength = 8192
 
-proc digest*(HashType: typedesc, path: string): MDigest[HashType.bits] =
+proc digest*(HashType: typedesc, window: Window, path: string): MDigest[HashType.bits] =
   mixin init, update, finish, clear
   var ctx: HashType
   ctx.init()
@@ -20,50 +20,50 @@ proc digest*(HashType: typedesc, path: string): MDigest[HashType.bits] =
   result = ctx.finish()
   ctx.clear()
 
-proc getSha1(path: string, textBox: TextBox) =
-  textBox.text = $sha1.digest(path)
+proc getSha1(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha1.digest(window, path)
 
-proc getSha2_256(path: string, textBox: TextBox) =
-  textBox.text = $sha256.digest(path)
+proc getSha2_256(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha256.digest(window, path)
 
-proc getSha2_384(path: string, textBox: TextBox) =
-  textBox.text = $sha384.digest(path)
+proc getSha2_384(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha384.digest(window, path)
 
-proc getSha2_512(path: string, textBox: TextBox) =
-  textBox.text = $sha512.digest(path)
+proc getSha2_512(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha512.digest(window, path)
 
-proc getSha3_256(path: string, textBox: TextBox) =
-  textBox.text = $sha3_256.digest(path)
+proc getSha3_256(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha3_256.digest(window, path)
 
-proc getSha3_384(path: string, textBox: TextBox) =
-  textBox.text = $sha3_384.digest(path)
+proc getSha3_384(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha3_384.digest(window, path)
 
-proc getSha3_512(path: string, textBox: TextBox) =
-  textBox.text = $sha3_512.digest(path)
+proc getSha3_512(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $sha3_512.digest(window, path)
 
-proc getKeccak_256(path: string, textBox: TextBox) =
-  textBox.text = $keccak_256.digest(path)
+proc getKeccak_256(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $keccak_256.digest(window, path)
 
-proc getKeccak_384(path: string, textBox: TextBox) =
-  textBox.text = $keccak_384.digest(path)
+proc getKeccak_384(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $keccak_384.digest(window, path)
 
-proc getKeccak_512(path: string, textBox: TextBox) =
-  textBox.text = $keccak_512.digest(path)
+proc getKeccak_512(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $keccak_512.digest(window, path)
 
-proc getBlake2_256(path: string, textBox: TextBox) =
-  textBox.text = $blake2_256.digest(path)
+proc getBlake2_256(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $blake2_256.digest(window, path)
 
-proc getBlake2_384(path: string, textBox: TextBox) =
-  textBox.text = $blake2_384.digest(path)
+proc getBlake2_384(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $blake2_384.digest(window, path)
 
-proc getBlake2_512(path: string, textBox: TextBox) =
-  textBox.text = $blake2_512.digest(path)
+proc getBlake2_512(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $blake2_512.digest(window, path)
 
-proc getRipemd_256(path: string, textBox: TextBox) =
-  textBox.text = $ripemd256.digest(path)
+proc getRipemd_256(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $ripemd256.digest(window, path)
 
-proc getRipemd_320(path: string, textBox: TextBox) =
-  textBox.text = $ripemd320.digest(path)
+proc getRipemd_320(window: Window, textBox: TextBox, path: string) =
+  textBox.text = $ripemd320.digest(window, path)
 
 
 if isMainModule:
@@ -82,6 +82,7 @@ if isMainModule:
   app.init()
 
   var window = newWindow()
+  window.title = "Hash Calculator"
   window.width = 1100
   window.height = 676
   window.onDropFiles = proc(event: DropFilesEvent) =
@@ -137,7 +138,7 @@ if isMainModule:
   sha1Button.heightMode = HeightMode_Fill
   sha1Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha1(text(srcTextBox), sha1TextBox)
+      spawn window.getSha1(sha1TextBox, text(srcTextBox))
 
   var sha2_256Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha2_256Container)
@@ -160,7 +161,7 @@ if isMainModule:
   sha2_256Button.heightMode = HeightMode_Fill
   sha2_256Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha2_256(text(srcTextBox), sha2_256TextBox)
+      spawn window.getSha2_256(sha2_256TextBox, text(srcTextBox))
 
   var sha2_384Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha2_384Container)
@@ -183,7 +184,7 @@ if isMainModule:
   sha2_384Button.heightMode = HeightMode_Fill
   sha2_384Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha2_384(text(srcTextBox), sha2_384TextBox)
+      spawn window.getSha2_384(sha2_384TextBox, text(srcTextBox))
 
   var sha2_512Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha2_512Container)
@@ -206,7 +207,7 @@ if isMainModule:
   sha2_512Button.heightMode = HeightMode_Fill
   sha2_512Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha2_512(text(srcTextBox), sha2_512TextBox)
+      spawn window.getSha2_512(sha2_512TextBox, text(srcTextBox))
 
   var sha3_256Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha3_256Container)
@@ -229,7 +230,7 @@ if isMainModule:
   sha3_256Button.heightMode = HeightMode_Fill
   sha3_256Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha3_256(text(srcTextBox), sha3_256TextBox)
+      spawn window.getSha3_256(sha3_256TextBox, text(srcTextBox))
 
   var sha3_384Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha3_384Container)
@@ -252,7 +253,7 @@ if isMainModule:
   sha3_384Button.heightMode = HeightMode_Fill
   sha3_384Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha3_384(text(srcTextBox), sha3_384TextBox)
+      spawn window.getSha3_384(sha3_384TextBox, text(srcTextBox))
 
   var sha3_512Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(sha3_512Container)
@@ -275,7 +276,7 @@ if isMainModule:
   sha3_512Button.heightMode = HeightMode_Fill
   sha3_512Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getSha3_512(text(srcTextBox), sha3_512TextBox)
+      spawn window.getSha3_512(sha3_512TextBox, text(srcTextBox))
 
   var keccak_256Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(keccak_256Container)
@@ -298,7 +299,7 @@ if isMainModule:
   keccak_256Button.heightMode = HeightMode_Fill
   keccak_256Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getKeccak_256(text(srcTextBox), keccak_256TextBox)
+      spawn window.getKeccak_256(keccak_256TextBox, text(srcTextBox))
 
   var keccak_384Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(keccak_384Container)
@@ -321,7 +322,7 @@ if isMainModule:
   keccak_384Button.heightMode = HeightMode_Fill
   keccak_384Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getKeccak_384(text(srcTextBox), keccak_384TextBox)
+      spawn window.getKeccak_384(keccak_384TextBox, text(srcTextBox))
 
   var keccak_512Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(keccak_512Container)
@@ -344,7 +345,7 @@ if isMainModule:
   keccak_512Button.heightMode = HeightMode_Fill
   keccak_512Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getKeccak_512(text(srcTextBox), keccak_512TextBox)
+      spawn window.getKeccak_512(keccak_512TextBox, text(srcTextBox))
 
   var blake2_256Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(blake2_256Container)
@@ -367,7 +368,7 @@ if isMainModule:
   blake2_256Button.heightMode = HeightMode_Fill
   blake2_256Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getBlake2_256(text(srcTextBox), blake2_256TextBox)
+      spawn window.getBlake2_256(blake2_256TextBox, text(srcTextBox))
 
   var blake2_384Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(blake2_384Container)
@@ -390,7 +391,7 @@ if isMainModule:
   blake2_384Button.heightMode = HeightMode_Fill
   blake2_384Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getBlake2_384(text(srcTextBox), blake2_384TextBox)
+      spawn window.getBlake2_384(blake2_384TextBox, text(srcTextBox))
 
   var blake2_512Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(blake2_512Container)
@@ -413,7 +414,7 @@ if isMainModule:
   blake2_512Button.heightMode = HeightMode_Fill
   blake2_512Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getBlake2_512(text(srcTextBox), blake2_512TextBox)
+      spawn window.getBlake2_512(blake2_512TextBox, text(srcTextBox))
 
   var ripemd_256Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(ripemd_256Container)
@@ -436,7 +437,7 @@ if isMainModule:
   ripemd_256Button.heightMode = HeightMode_Fill
   ripemd_256Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getRipemd_256(text(srcTextBox), ripemd_256TextBox)
+      spawn window.getRipemd_256(ripemd_256TextBox, text(srcTextBox))
 
   var ripemd_320Container = newLayoutContainer(Layout_Horizontal)
   subContainer.add(ripemd_320Container)
@@ -459,7 +460,7 @@ if isMainModule:
   ripemd_320Button.heightMode = HeightMode_Fill
   ripemd_320Button.onClick = proc(event: ClickEvent) =
     if srcTextBox.text.len > 0:
-      spawn getRipemd_320(text(srcTextBox), ripemd_320TextBox)
+      spawn window.getRipemd_320(ripemd_320TextBox, text(srcTextBox))
 
   window.show()
   app.run()
